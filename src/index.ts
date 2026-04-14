@@ -29,6 +29,20 @@ ipcMain.handle('dialog:openFile', async () => {
   return null; 
 });
 
+ipcMain.handle('dialog:saveFile', async (event, content) => {
+  const { filePath } = await dialog.showSaveDialog({
+    buttonLabel: 'Save Adjusted Schedule',
+    defaultPath: 'adjusted_schedule.csv',
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+  });
+
+  if (filePath) {
+    fs.writeFileSync(filePath, content, 'utf-8');
+    return true;
+  }
+  return false;
+});
+
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

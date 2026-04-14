@@ -1,11 +1,11 @@
-Activity,desc,duration,trade
-1,this is a test,7d,Pipe
-2, testing 123, 20d, Elec
-3, still testing, 50d, PSF
-4, testing more, 22d, Elec
-5, repeat testing, 10d, Pipe
-6, repeat testing, 10d, Pipe
-7, repeat testing, 10d, Pipe
-8, repeat testing, 10d, Pipe
-9, repeat testing, 10d, Pipe
-10, repeat testing, 10d, Pipe
+Act_ID,Act_Desc,Orig_Dur,Res_ID,Res_Level,Percent_Complete,ES_Date,EF_Date,Float,Percent_Planned,BS_Date,BF_Date,Res_Curve,Key_Event
+10056001.01.01, Install Structural Foundation, 5d, 500.07.PSF, 32, 0%, 2/27/2026, 3/3/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.01A, Paint Foundation, 2d, 500.07.PSF, 32, 0%, 2/27/2026, 3/3/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.02, Install Equipment on Foundation, 5d, 500.07.OSM, 80, 0%, 3/4/2026, 3/9/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.03, Hookup Equipment Electrically and Test, 3d, 500.07.ELE, 80, 0%, 3/10/2026, 3/12/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+20721003.01.01, Unbolt and Remove Equipment, 5d, 500.07.OSM, 80, 0%, 13Apr2026, 17Apr2026, 5d, 0%, 13Apr2026, 17Apr2026, T, UD
+20721003.01.02, Install New Equipment and Torque, 5d, 500.07.OSM, 80, 0%, 13Apr2026, 17Apr2026, 5d, 0%, 13Apr2026, 17Apr2026, T, UD
+20721003.01.03, Install and Connect New Piping to New Equipment, 5d, 500.07.PIP, 160, 0%, 13Apr2026, 17Apr2026, 5d, 0%, 13Apr2026, 17Apr2026, T, UD
+20721003.01.04, Accomplish Static Pressure Test of New Piping, 1d, 500.07.PIP, 20, 0%, 13Apr26, 17Apr26, 5d, 0%, 13Apr26, 17Apr26, T, UD
+20721003.01.05, Start and Test New Equipment Restored to Working Order, 2d, 500.07.OSM, 32, 0%, 4/20/26, 4/21/26, 5d, 0%, 4/20/26, 4/21/26, T, UD
+00000000.1.6, PCD Accomplished, 1d, 500.07.PMO, 0, 0%, 4/25/2026, 4/25/26, 5d, 0%, 4/25/2026, 4/25/26, T, PCD
