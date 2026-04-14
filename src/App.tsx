@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
+// Day 2 of 365 - Let's go!
+
 const normalizeDate = (dateStr: string): string => {
   if (!dateStr || dateStr.trim() === "") return "";
   const cleanStr = dateStr.trim();
