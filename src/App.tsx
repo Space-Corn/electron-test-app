@@ -1,100 +1,34 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
+
 import Histogram from './components/Histogram';
+import { ScheduleRow } from './types/project';
+import { processRawData, sanitizeDate } from './services/dataProcessor';
 
-// Day 3 of 365, testing git push some more.
 
-const normalizeDate = (dateStr: string): string => {
-  if (!dateStr || dateStr.trim() === "") return "";
-  const cleanStr = dateStr.trim();
-
-  // Handle DMonYYYY or DMonYY (e.g., 13Apr2026 or 13Apr26)
-  const dMonRegex = /^(\d{1,2})([a-zA-Z]{3})(\d{2,4})$/;
-  const match = cleanStr.match(dMonRegex);
-
-  if (match) {
-    const [_, day, month, year] = match;
-    const parsed = new Date(`${day} ${month} ${year}`);
-    if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
-  }
-
-  // Fallback for standard formats (M/D/YY, etc.)
-  const date = new Date(cleanStr);
-  return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : dateStr;
-};
-
-const detectPercentFormat = (rows: any[], field: string) => {
-  for (let row of rows) {
-    const val = String(row[field] || "").trim();
-    // Skip non-informative values
-    if (val === "" || val === "0" || val === "0.00" || val === "0%") continue;
-
-    if (val.includes('%')) return 'PERCENT_STRING'; // "54.37%"
-    if (parseFloat(val) > 1) return 'WHOLE_NUMBER'; // "54.37"
-    return 'DECIMAL'; // "0.5437"
-  }
-  return 'DECIMAL'; 
-};
 
 const App = () => {
   const [filePath, setFilePath] = useState<string | null>(null);
   const [data, setData] = useState<any[]>([]);
 
-  const normalizeScheduleData = () => {
-    if (data.length === 0) return;
-  
-    // Define the columns that need special treatment
-    const dateFields = ['ES_Date', 'EF_Date', 'BS_Date', 'BF_Date'];
-    const percentFields = ['Percent_Complete', 'Percent_Planned'];
-  
-    // Identify the percentage "mode" for this specific file
-    const percentMode = detectPercentFormat(data, percentFields[0]);
-  
-    const adjusted = data.map(row => {
-      const newRow = { ...row };
-  
-      // 1. Fix Dates
-      dateFields.forEach(field => {
-        if (newRow[field]) {
-          newRow[field] = normalizeDate(newRow[field]);
-        }
-      });
-  
-      // 2. Fix Percentages
-      percentFields.forEach(field => {
-        let rawVal = String(newRow[field] || "0").replace('%', '').trim();
-        let num = parseFloat(rawVal);
-  
-        if (isNaN(num)) {
-          newRow[field] = "0.0000";
-        } else if (percentMode === 'PERCENT_STRING' || percentMode === 'WHOLE_NUMBER') {
-          // Convert "54" or "54%" to "0.5400"
-          newRow[field] = (num / 100).toFixed(4);
-        } else {
-          // Already a decimal like "0.5437", just clean up precision
-          newRow[field] = num.toFixed(4);
-        }
-      });
-  
-      return newRow;
-    });
-  
-    setData(adjusted);
-    alert("Data Normalized: Dates standardized and Percentages converted to decimals.");
-  };
 
   const handleSelectFile = async () => {
     const result = await (window as any).electronAPI.openFile();
     
     if (result && result.content) {
-      // result.content is the string we read in index.ts
+      // 1. Parse the raw string into a generic array of objects
       const parsed = Papa.parse(result.content, { 
         header: true,
-        skipEmptyLines: true // This helps with those extra newlines at the end
+        skipEmptyLines: true 
       });
   
-      setData(parsed.data);
+      // 2. Convert the "dirty" array into your "Ground Truth"
+      // This uses the function we just moved to dataProcessor.ts
+      const cleanData = processRawData(parsed.data);
+
+      // 3. Save the clean data to your state
+      setData(cleanData);
       setFilePath(result.filePath);
     }
   };
@@ -141,7 +75,6 @@ const App = () => {
         <hr style={{width: '100%'}} />
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={normalizeScheduleData}>Normalize Data</button>
           <button onClick={exportCSV} style={{ backgroundColor: '#28a745', color: 'white' }}>
             Export CSV
           </button>
