@@ -62,35 +62,22 @@ export const normalizeToDays = (raw: any): number => {
 };
 
 export const processRawData = (rawRows: any[]): ScheduleRow[] => {
-    return rawRows.map((row, index) => {
-    return {
-        // Identity & Description
-        actId: String(row['Activity ID'] || row['ID'] || index),
-        actType: String(row['Activity Type'] || ""),
-        actDesc: String(row['Activity Name'] || row['Description'] || ""),
-        
-        // Durations (using our new time normalizer)
-        origDur: normalizeToDays(row['Original Duration']),
-        remDur: normalizeToDays(row['Remaining Duration']),
-        
-        // Percentages (standardizing to 0.0 - 1.0 range)
-        percentComp: sanitizeNumber(row['Activity % Complete']) / 100,
-        percentPlan: sanitizeNumber(row['Performance % Complete']) / 100,
-        
-        // Scheduling Dates
-        esDate: sanitizeDate(row['ES_Date']),
-        efDate: sanitizeDate(row['EF_Date']),
-        bsDate: sanitizeDate(row['BS_Date']),
-        bfDate: sanitizeDate(row['BF_Date']),
-        
-        // Resource & Math
-        resId: String(row['Res_ID'] || 'Unassigned'),
-        totFloat: sanitizeNumber(row['Total Float']),
-        resLevel: sanitizeNumber(row['Res_Level']),
-        resCurve: String(row['Resource Curve'] || 'Linear'),
-        
-        // The "Safety Net"
-        originalData: row 
-    };
-    });
-};
+    return rawRows.map((row, index) => ({
+      actId: String(row['Activity ID'] || row['ID'] || index),
+      actType: String(row['Activity Type'] || ""),
+      actDesc: String(row['Activity Name'] || row['Description'] || ""),
+      origDur: normalizeToDays(row['Original Duration']),
+      remDur: normalizeToDays(row['Remaining Duration']),
+      percentComp: sanitizeNumber(row['Activity % Complete']) / 100,
+      percentPlan: sanitizeNumber(row['Performance % Complete']) / 100,
+      resId: String(row['Res_ID'] || 'Unassigned'),
+      esDate: sanitizeDate(row['ES_Date']),
+      efDate: sanitizeDate(row['EF_Date']),
+      bsDate: sanitizeDate(row['BS_Date']),
+      bfDate: sanitizeDate(row['BF_Date']),
+      totFloat: sanitizeNumber(row['Total Float']),
+      resLevel: sanitizeNumber(row['Res_Level']),
+      resCurve: String(row['Resource Curve'] || 'Linear'),
+      originalData: row 
+    }));
+  };

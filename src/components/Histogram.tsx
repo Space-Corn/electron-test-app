@@ -7,6 +7,8 @@ interface HistogramProps {
     weekEndingDay?: number; // 0 = Sun, 5 = Fri, etc.
   }
 
+  
+
 const getWeekIdentifier = (date: Date, weekEndingDay: number) => {
     const d = new Date(date);
     // Calculate how many days to add to get to the next 'weekEndingDay'
@@ -20,14 +22,14 @@ const getWeekIdentifier = (date: Date, weekEndingDay: number) => {
       const weeks: { [key: string]: number } = {};
   
       data.forEach((row, index) => {
-        const start = new Date(row['ES_Date']);
-        const end = new Date(row['EF_Date']);
+        const start = new Date(row['esDate']);
+        const end = new Date(row['efDate']);
 
         if (isNaN(start.getTime())) {
-            console.warn(`Row ${index} has an invalid ES_Date:`, row['ES_Date']);
+            console.warn(`Row ${index} has an invalid Early Start Date:`, row['esDate']);
         }
 
-        const totalHours = parseFloat(row['Res_Level'] || "0");
+        const totalHours = parseFloat(row['resLevel'] || "0");
   
         if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && totalHours > 0) {
           // 1. Calculate Duration (Inclusive)

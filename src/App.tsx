@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
-
+import './index.css';
+import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
 import { ScheduleRow } from './types/project';
 import { processRawData, sanitizeDate } from './services/dataProcessor';
 
-
+declare global {
+  interface Window {
+    electronAPI: {
+      openFile: () => Promise<{ filePath: string; content: string } | null>;
+      saveFile: (content: string) => Promise<boolean>;
+    };
+  }
+}
 
 const App = () => {
   const [filePath, setFilePath] = useState<string | null>(null);
@@ -14,7 +22,7 @@ const App = () => {
 
 
   const handleSelectFile = async () => {
-    const result = await (window as any).electronAPI.openFile();
+    const result = await window.electronAPI?.openFile();
     
     if (result && result.content) {
       // 1. Parse the raw string into a generic array of objects
@@ -35,88 +43,67 @@ const App = () => {
 
   const exportCSV = async () => {
     const csvString = Papa.unparse(data);
-    // We'll need to create this saveFile bridge in a moment
-    await (window as any).electronAPI.saveFile(csvString);
+ 
+    const success = await window.electronAPI?.saveFile(csvString);
+    if (success) {
     alert("File Exported Successfully!");
+    }
   };
 
-  const [weekEnding, setWeekEnding] = useState(5); // Default to Friday
+  const [weekEndingDay, setWeekEndingDay] = useState(5); // Default to Friday
 
+  console.log(window);
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
-      
-      {/* LEFT SIDEBAR: Controls & Status */}
-      <aside style={{ 
-        width: '300px', 
-        padding: '20px', 
-        borderRight: '1px solid #ccc', 
-        background: '#fafafa',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px'
-      }}>
-        
-        <h2>Work Tool</h2>
-        
-        <button onClick={handleSelectFile}>Select File</button>
-        {filePath && <p style={{fontSize: '12px', wordBreak: 'break-all'}}>{filePath}</p>}
-
-        <label>Week Ending On:</label>
-        <select value={weekEnding} onChange={(e) => setWeekEnding(parseInt(e.target.value))}>
-          <option value={1}>Monday</option>
-          <option value={2}>Tuesday</option>
-          <option value={3}>Wednesday</option>
-          <option value={4}>Thursday</option>
-          <option value={5}>Friday</option>
-          <option value={6}>Saturday</option>
-          <option value={0}>Sunday</option>
-        </select>
-        
-        <hr style={{width: '100%'}} />
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={exportCSV} style={{ backgroundColor: '#28a745', color: 'white' }}>
+    <div className="app-container">
+      {/*Top Menu Bar, file optons for controls */}
+      <header className="menu-bar">
+        <div className="brand">Schedule Resource Prototype</div>
+        <div className="file-status">{filePath || "No File Loaded"}</div>
+        <div className="actions">
+          {data.length > 0 && (
+          <button onClick={exportCSV} className="export-btn">
             Export CSV
           </button>
-        </div>
-      </aside>
-  
-      {/* RIGHT STAGE: Visualizations & Data Preview */}
-      <main style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
-        
-        {/* AREA 1: Visualizations (Your next task!) */}
-        <section style={{ marginBottom: '30px', minHeight: '200px', border: '2px dashed #ddd', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Histogram data={data} weekEndingDay={weekEnding} />
-        </section>
-  
-        {/* AREA 2: Data Preview */}
-        <section>
-          {data.length > 0 ? (
-            <div style={{ overflowX: 'auto' }}>
-              <p><strong>Status:</strong> {data.length.toLocaleString()} rows loaded.</p>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-                <thead>
-                  <tr>{Object.keys(data[0]).map(key => <th key={key} style={{ textAlign: 'left', padding: '5px' }}>{key}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {data.slice(0, 10).map((row, i) => (
-                    <tr key={i}>
-                      {Object.values(row).map((val: any, j) => (
-                        <td key={j} style={{ padding: '5px' }}>
-                          {val !== null ? String(val) : ""}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p>Import a file to see the data preview.</p>
           )}
-        </section>
-      </main>
-  
+        </div>
+      </header>
+
+      {/* 2. UPPER LEFT: Controls & Configuration */}
+      <section className="scroll-pane top-left-container">
+        <h3>Project Controls</h3>
+        <button onClick={handleSelectFile} className="import-btn">
+          Import CSV
+        </button>
+
+        <div className="control-group">
+          <label>Week Ending Day:</label>
+          <select value={weekEndingDay} onChange={(e) => setWeekEndingDay(parseInt(e.target.value))}>
+            <option value={1}>Monday</option>
+            <option value={2}>Tuesday</option>
+            <option value={3}>Wednesday</option>
+            <option value={4}>Thursday</option>
+            <option value={5}>Friday</option>
+            <option value={6}>Saturday</option>
+            <option value={0}>Sunday</option>
+          </select>
+        </div>
+      </section>
+
+      {/* 3. UPPER RIGHT: Data Table View */}
+      <section className="scroll-pane top-right-container">
+        <h3>Schedule Data</h3>
+          <DataTable data={data} />
+
+      </section>
+      {/* 4. BOTTOM: Full-Width Histogram Stage */}
+      <footer className="histogram-container">
+        <div className="histogram-header">
+          <h3>Schedule Resource Distribution</h3>
+        </div>
+        <div className="histogram-stage">
+          <Histogram data={data} weekEndingDay={weekEndingDay} />
+        </div>
+      </footer>
     </div>
   );
 };
