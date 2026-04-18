@@ -17,7 +17,11 @@ if (require('electron-squirrel-startup')) {
 ipcMain.handle('dialog:openFile', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openFile'],
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    filters: [
+      { name: 'Supported Files', extensions: ['csv', 'json']},
+      { name: 'CSV Files', extensions: ['csv'] },
+      { name: 'Project Files', extensions: ['json']}
+    ]
   });
 
   if (!canceled) {
@@ -29,11 +33,11 @@ ipcMain.handle('dialog:openFile', async () => {
   return null; 
 });
 
+//for generic json data, can repurpose later
 ipcMain.handle('dialog:saveFile', async (event, content) => {
   const { filePath } = await dialog.showSaveDialog({
-    buttonLabel: 'Save Adjusted Schedule',
-    defaultPath: 'adjusted_schedule.csv',
-    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    defaultPath: 'data.json',
+    filters: [{ name: 'JSON Data', extensions: ['json'] }]
   });
 
   if (filePath) {
@@ -41,6 +45,36 @@ ipcMain.handle('dialog:saveFile', async (event, content) => {
     return true;
   }
   return false;
+});
+
+// For the Internal Project State
+ipcMain.handle('dialog:saveProject', async (event, content) => {
+  const { filePath } = await dialog.showSaveDialog({
+    title: 'Save Project',
+    defaultPath: 'schedule_project.json',
+    filters: [{ name: 'Project Files', extensions: ['json'] }]
+  });
+
+  if (filePath) {
+    fs.writeFileSync(filePath, content, 'utf-8');
+    return filePath; // Returning the path is helpful for the UI
+  }
+  return null;
+});
+
+// For the Functional CSV Export
+ipcMain.handle('dialog:exportCSV', async (event, content) => {
+  const { filePath } = await dialog.showSaveDialog({
+    title: 'Export CSV',
+    defaultPath: 'processed_schedule.csv',
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+  });
+
+  if (filePath) {
+    fs.writeFileSync(filePath, content, 'utf-8');
+    return filePath;
+  }
+  return null;
 });
 
 const createWindow = (): void => {

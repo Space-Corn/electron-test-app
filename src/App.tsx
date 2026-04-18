@@ -6,12 +6,15 @@ import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
 import { ScheduleRow } from './types/project';
 import { processRawData, sanitizeDate } from './services/dataProcessor';
+import { createProjectPayload } from './services/projectService';
 
 declare global {
   interface Window {
     electronAPI: {
       openFile: () => Promise<{ filePath: string; content: string } | null>;
       saveFile: (content: string) => Promise<boolean>;
+      saveProject: (content: string) => Promise<boolean>;
+      exportCSV: (content: string) => Promise<boolean>;
     };
   }
 }
@@ -24,29 +27,61 @@ const App = () => {
   const handleSelectFile = async () => {
     const result = await window.electronAPI?.openFile();
     
-    if (result && result.content) {
-      // 1. Parse the raw string into a generic array of objects
+    if (result && result.content && result.filePath) {
+      const extension =result.filePath.split(".").pop()?.toLowerCase();
+
+      if ( extension === "csv"){
+         // parse csv file with Papa.parse, and run it through processRawData to get cleanData.
       const parsed = Papa.parse(result.content, { 
         header: true,
         skipEmptyLines: true 
       });
   
-      // 2. Convert the "dirty" array into your "Ground Truth"
-      // This uses the function we just moved to dataProcessor.ts
+      // 2. Convert the "dirty" array into clean data format
+      // This is our data cleaner in dataProcessor.ts
       const cleanData = processRawData(parsed.data);
 
       // 3. Save the clean data to your state
       setData(cleanData);
       setFilePath(result.filePath);
+
+      } else if (extension === 'json'){
+        // detect if its a fake JSON file
+        try {
+          const projectData = JSON.parse(result.content);
+          if (!projectData.scheduleData) {
+            throw new Error('Invalid project file format.');
+          }
+          
+            // we need to handle our json projectData
+          setData(projectData.scheduleData);
+          setWeekEndingDay(projectData.settings.weekEndingDay);
+          setFilePath(result.filePath);
+          alert("Project loaded successfully!");
+        } catch (error){
+          console.error("Load error:", error);
+          alert('Failed to load project: the project may be in the wrong format.')
+        }
+
+      } else {
+        alert('Unsupported file type detected. Please either select a JSON or CSV file.');
+      }
     }
   };
 
-  const exportCSV = async () => {
+  const handleSaveProject = async () => {
+    const payload = createProjectPayload(data, weekEndingDay, filePath);
+    const jsonString = JSON.stringify(payload, null, 2); // The '2' makes it readable
+    await window.electronAPI.saveProject(jsonString);
+  };
+  
+  const handleExportCSV = async () => {
     const csvString = Papa.unparse(data);
- 
+    await window.electronAPI.exportCSV(csvString);
+
     const success = await window.electronAPI?.saveFile(csvString);
     if (success) {
-    alert("File Exported Successfully!");
+      alert("File Exported Successfully!");
     }
   };
 
@@ -61,7 +96,7 @@ const App = () => {
         <div className="file-status">{filePath || "No File Loaded"}</div>
         <div className="actions">
           {data.length > 0 && (
-          <button onClick={exportCSV} className="export-btn">
+          <button onClick={handleExportCSV} className="export-btn">
             Export CSV
           </button>
           )}

@@ -20,3 +20,13 @@ export interface ScheduleRow {
     resCurve: string; // e.g., "Linear", "Back Loaded"
     originalData: any; 
 }
+
+export interface ProjectFile {
+    version: string;           // Useful if you add features later and need to track "old" saves
+    lastModified: string;
+    settings: {
+      weekEndingDay: number;
+      originalFilePath: string | null;
+    };
+    scheduleData: ScheduleRow[];
+  }
