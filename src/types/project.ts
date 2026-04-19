@@ -22,6 +22,11 @@ export interface ScheduleRow {
     keyEvent: string;
 }
 
+export interface WeeklyStat {
+  week: string;
+  hours: number;
+}
+
 export interface ProjectFile {
     version: string;           // Useful if you add features later and need to track "old" saves
     lastModified: string;

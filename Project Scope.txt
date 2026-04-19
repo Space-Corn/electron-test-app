@@ -1,0 +1,36 @@
+Scheduler Helper Application
+
+What are the the core things that this needs to do? (Initially)
+
+1. Import project data (basic functionality completed)
+    a. Import data according to an import profile (do profiles make sense for the import side?)
+        Thoughts: How do we govern the data appropriately? What tells the user, 'these are the minimum fields you need to import a project'?
+
+        Ideas: Prompt the user to tell the application what the data type is for each of the fields e.g. you import, system reads it, window appears with the headers and a drop down menu next to each one to confirm the data type. We can have the app default to it's 'best guess' at what the data type should be. Then the normalize functions run to save the data in the format best for the application. We could delay having to create a import profile system using this method - a later feature could be to use the import profile to skip this more tedious step when they're an 'advanced' user and already know what the data flow should be.
+
+
+2. Export project data (basic functionality completed)
+    a. Export data according to an export profile. The user sets up a profile with their export 'defaults'. They can save multiple profiles, and select the one at the time of export that suits their needs.
+        Thoughts: What should be a part of this profile?
+            i. Formats (export all date fields as 15Apr2026 or 04/15/26 etc. Also how percentages should be displayed e.g. 54.67, 54.67%, 0.5467)
+            ii. Field order (but the field order specified in the profile then must always match the imported data. How would this work?)
+            iii. file type? csv, txt, xlsx (maybe)
+            iv. default file name?
+
+
+3. View the data (partially built)
+    a. View the data via a histogram and table (columns align with table values e.g. the table values are directly under the columns. Date labels at the top of the histogram.)
+    b. View the distribution of each resource (Res_ID) in the histgram. Project total -> stacked columns representative of each resource. Controls to filter for a specific resource to view that resources distribution on its own. 
+    c. Swap between early dates and baseline dates (or other dates if imported)
+
+4. Save and load project data. Export isn't the only end goal, we want to manipulate the distribution (the data) at a later point.
+    a. project save file would have project name, project start date, target completion date, project owner, Project ID (can be user specified or the system can generate one.)
+
+
+
+------ Further down the line -------
+5. Changing/updating the data. 
+    a. This tool will be used to improve the imported resource distribution. That is the primary goal actually.
+        Thoughts: This will likely require a lot more data, and probably multiple imports due to needing different tables of data. We can think about this later.
+
+6. More features to come - this will be a project management tool to allow the project team to make strategic decisions when it comes to resource distribution.

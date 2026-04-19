@@ -1,63 +1,25 @@
 import React from 'react';
+import { calculateDailyResourceTotals } from '../services/resourceCalculator';
+import { calculateWeeklyResourceTotals } from '../services/resourceCalculator'
 
-//We made a script.
-// We define what the Histogram needs to function
+
+// We define what the Histogram needs to function, basic data for now from resourceCalculator
 interface HistogramProps {
     data: any[];
-    weekEndingDay?: number; // 0 = Sun, 5 = Fri, etc.
-  }
+    weekEndingDay: number;
+}
 
+const Histogram: React.FC<HistogramProps> = ({ data, weekEndingDay }) => {
+  const dailyData = calculateDailyResourceTotals(data);
+
+  //we can put conditional logic in here later, if we add a control to view histogram by day, week, month etc.
+  const stats = calculateWeeklyResourceTotals( dailyData, weekEndingDay);
   
-
-const getWeekIdentifier = (date: Date, weekEndingDay: number) => {
-    const d = new Date(date);
-    // Calculate how many days to add to get to the next 'weekEndingDay'
-    const daysUntilEnd = (weekEndingDay - d.getDay() + 7) % 7;
-    d.setDate(d.getDate() + daysUntilEnd);
-    return d.toISOString().split('T')[0];
-  };
-
-  const Histogram: React.FC<HistogramProps> = ({ data, weekEndingDay = 5 }) => {
-    const getWeeklyStats = () => {
-      const weeks: { [key: string]: number } = {};
-  
-      data.forEach((row, index) => {
-        const start = new Date(row['esDate']);
-        const end = new Date(row['efDate']);
-
-        if (isNaN(start.getTime())) {
-            console.warn(`Row ${index} has an invalid Early Start Date:`, row['esDate']);
-        }
-
-        const totalHours = parseFloat(row['resLevel'] || "0");
-  
-        if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && totalHours > 0) {
-          // 1. Calculate Duration (Inclusive)
-          const duration = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-          const dailyRate = totalHours / duration;
-  
-          // 2. Distribute Daily
-          for (let i = 0; i < duration; i++) {
-            const currentDay = new Date(start);
-            currentDay.setDate(start.getDate() + i);
-            
-            // 3. Determine which week this day falls into
-            const weekKey = getWeekIdentifier(currentDay, weekEndingDay);
-            weeks[weekKey] = (weeks[weekKey] || 0) + dailyRate;
-          }
-        }
-      });
-  
-      return Object.entries(weeks).sort((a, b) => a[0].localeCompare(b[0]));
-    };
-
-  const stats = getWeeklyStats();
-
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', height: '100%' }}>
       <h3 style={{ marginTop: 0 }}>Weekly Hours Distribution</h3>
       <div style={{ display: 'flex', alignItems: 'flex-end', height: '180px', gap: '8px' }}>
-        {stats.map(([week, hours]) => (
+        {stats.map(({week, hours}) => (
           <div key={week} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div 
               title={`Week Ending: ${week}\nTotal Hours: ${Math.round(hours)}`}

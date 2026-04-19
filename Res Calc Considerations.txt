@@ -1,0 +1,29 @@
+// Basic Example:
+// Input: 2400 hours, 12 weeks(periods), linear distribution, starting week_1.we_date (not a real object or property)
+// Output: 200 hours per week, starting week_1.we_date to week_10.we_date
+//more complex calculations potentially considering the calendar (we'll take it as metadata at least), original duration, remaining duration, and the status date. status date is the big one, because we don't want to reforecast 'performed' resources, e.g. a work package is 40% complete, only use 60% of the resource level (budget), and forecast that remaining number using the status date to determine the starting week where the remaining resources will begin, to the we_date the the ef_date will fall into
+
+
+//Future considerations
+//Supposing 340 budgeted hours, 17 day activity operating on a 5 day M-F calendar begins on a Tuesday, and ends on a Wednesday. Here's what the distribution would look like:
+// Week 1 : Tu - F is 4 days, (4/17)*340 hours distributed here
+// Week 2 : M - F is 5 days, (5/17)*340 hours
+// Week 3 : same as week 2, (5/17)*340 hours
+// Week 4 : M - W, 3 days,  (3/17)*340 hours
+// Total : ((4+5+5+3)/17)*340 hours -> all budget distributed.
+
+// The most sensible way to keep track of all of this is to distribute the hours by day and then aggregate to the week, month, quarter, financial month as needed.
+// We'll assume a 5 working day week to start, working Monday through Friday. Eventually, we'll have calendar be part of the scheduleRow data coming in as a string, and we'll have the user specify the calendar definition for their project. We'll keep the imported labels for easy export later on. It would look something like this:
+//** */ Calendar_1 =  {
+//      userCalName: 5Day,
+//      workingDays: {
+//          Monday: true,
+//          Tuesday: true,
+//          Wednesday: true,
+//          Thursday: true,
+//          Friday: true,
+//          Saturday: false,
+//          Sunday: false
+//      }
+//    }
+//

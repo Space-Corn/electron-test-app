@@ -132,7 +132,7 @@ const App = () => {
       {/* 4. BOTTOM: Full-Width Histogram Stage */}
       <footer className="histogram-container">
         <div className="histogram-header">
-          <h3>Schedule Resource Distribution</h3>
+          <h3>Histrogram</h3>
         </div>
         <div className="histogram-stage">
           <Histogram data={data} weekEndingDay={weekEndingDay} />
