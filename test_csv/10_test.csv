@@ -1,4 +1,4 @@
-Act_ID,Act_Desc,Orig_Dur,Res_ID,Res_Level,Percent_Complete,ES_Date,EF_Date,Float,Percent_Planned,BS_Date,BF_Date,Res_Curve,Key_Event
+actId,actDesc,origDur,resId,resLevel,percentComplete,esDate,efDate,totalFloat,percentPlanned,bsDate,bfDate,resCurve,keyEvent
 10056001.01.01, Install Structural Foundation, 5d, 500.07.PSF, 32, 0%, 2/27/2026, 3/3/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
 10056001.01.01A, Paint Foundation, 2d, 500.07.PSF, 32, 0%, 2/27/2026, 3/3/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
 10056001.01.02, Install Equipment on Foundation, 5d, 500.07.OSM, 80, 0%, 3/4/2026, 3/9/2026, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD

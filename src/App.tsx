@@ -77,9 +77,8 @@ const App = () => {
   
   const handleExportCSV = async () => {
     const csvString = Papa.unparse(data);
-    await window.electronAPI.exportCSV(csvString);
+    const success = await window.electronAPI.exportCSV(csvString);
 
-    const success = await window.electronAPI?.saveFile(csvString);
     if (success) {
       alert("File Exported Successfully!");
     }

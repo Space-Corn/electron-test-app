@@ -6,8 +6,8 @@ export interface ScheduleRow {
     origDur: number; 
     remDur: number;
     // Percentages are best as decimals (0.54 instead of "54%")
-    percentComp: number;
-    percentPlan: number;
+    percentComplete: number;
+    percentPlanned: number;
     resId: string;
     // Dates stay as ISO strings "YYYY-MM-DD"
     esDate: string;
@@ -15,10 +15,11 @@ export interface ScheduleRow {
     bsDate: string;
     bfDate: string;
     // Float is vital for scheduling logic—keep it as a number!
-    totFloat: number;
+    totalFloat: number;
     resLevel: number;
     resCurve: string; // e.g., "Linear", "Back Loaded"
     originalData: any; 
+    keyEvent: string;
 }
 
 export interface ProjectFile {

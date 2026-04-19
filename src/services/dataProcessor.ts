@@ -28,7 +28,7 @@ export const sanitizeDate = (raw: any): string => {
     if (!raw) return 0;
   
     // Remove everything except numbers and decimals
-    const clean = String(raw).replace(/[^-0.9.]/g, '');
+    const clean = String(raw).replace(/[^-0-9.]/g, '');
     const num = parseFloat(clean);
   
     return isNaN(num) ? 0 : num;
@@ -63,21 +63,22 @@ export const normalizeToDays = (raw: any): number => {
 
 export const processRawData = (rawRows: any[]): ScheduleRow[] => {
     return rawRows.map((row, index) => ({
-      actId: String(row['Activity ID'] || row['ID'] || index),
-      actType: String(row['Activity Type'] || ""),
-      actDesc: String(row['Activity Name'] || row['Description'] || ""),
-      origDur: normalizeToDays(row['Original Duration']),
-      remDur: normalizeToDays(row['Remaining Duration']),
-      percentComp: sanitizeNumber(row['Activity % Complete']) / 100,
-      percentPlan: sanitizeNumber(row['Performance % Complete']) / 100,
-      resId: String(row['Res_ID'] || 'Unassigned'),
-      esDate: sanitizeDate(row['ES_Date']),
-      efDate: sanitizeDate(row['EF_Date']),
-      bsDate: sanitizeDate(row['BS_Date']),
-      bfDate: sanitizeDate(row['BF_Date']),
-      totFloat: sanitizeNumber(row['Total Float']),
-      resLevel: sanitizeNumber(row['Res_Level']),
-      resCurve: String(row['Resource Curve'] || 'Linear'),
+      actId: String(row['Activity ID'] || row['actId'] || index),
+      actType: String(row['Activity Type'] || row['actType'] || ""),
+      actDesc: String(row['Activity Name'] || row['actDesc'] || ""),
+      origDur: normalizeToDays(row['origDur']),
+      remDur: normalizeToDays(row['remDur']),
+      percentComplete: sanitizeNumber(row['percentComplete']) / 100,
+      percentPlanned: sanitizeNumber(row['percentPlanned']) / 100,
+      resId: String(row['resId'] || 'Unassigned'),
+      esDate: sanitizeDate(row['esDate']),
+      efDate: sanitizeDate(row['efDate']),
+      bsDate: sanitizeDate(row['bsDate']),
+      bfDate: sanitizeDate(row['bfDate']),
+      totalFloat: sanitizeNumber(row['totalFloat']),
+      resLevel: sanitizeNumber(row['resLevel']),
+      resCurve: String(row['resCurve'] || 'Linear'),
+      keyEvent: String(row['keyEvent']),
       originalData: row 
     }));
   };
