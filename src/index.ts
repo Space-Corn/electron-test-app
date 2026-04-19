@@ -87,15 +87,31 @@ const createWindow = (): void => {
   });
 
 // --- START MENU DEFINITION ---
+const isMac = process.platform === 'darwin';
+
 const template: any[] = [
+  ...(isMac ? [{ role: 'appMenu' }] : []), // This puts the standard Mac menu first
   {
     label: 'File',
     submenu: [
-      { label: 'Import File', accelerator: 'CmdOrCtrl+O', click: () => mainWindow.webContents.send('menu:open-file') },
-      { label: 'Save Project', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
-      { label: 'Export CSV', click: () => mainWindow.webContents.send('menu:export-csv') },
+      { label: 'Import File...', accelerator: 'CmdOrCtrl+O', click: () => mainWindow.webContents.send('menu:open-file') },
+      { label: 'Save Project As...', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
+      { label: 'Export CSV...', click: () => mainWindow.webContents.send('menu:export-csv') },
       { type: 'separator' },
       { role: 'quit' }
+    ]
+  },
+  {
+    label: 'Edit',
+    submenu:[
+      { label: 'Hi there, you found me.' },
+      { label: 'Project Preferences' },
+    ]
+  },
+  {
+    label: 'Schedule',
+    submenu:[
+      { label: 'Future scheduling options will go here.'}
     ]
   },
   {
