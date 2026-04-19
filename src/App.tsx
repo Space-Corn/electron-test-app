@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
 import './index.css';
@@ -15,6 +15,7 @@ declare global {
       saveFile: (content: string) => Promise<boolean>;
       saveProject: (content: string) => Promise<boolean>;
       exportCSV: (content: string) => Promise<boolean>;
+      onMenuAction: (callback: (channel: string, data?: any) => void) => void;
     };
   }
 }
@@ -22,6 +23,17 @@ declare global {
 const App = () => {
   const [filePath, setFilePath] = useState<string | null>(null);
   const [data, setData] = useState<any[]>([]);
+  const [weekEndingDay, setWeekEndingDay] = useState(5); // Default to Friday
+
+  // --- NEW: MENU LISTENER ---
+  useEffect(() => {
+    window.electronAPI.onMenuAction((channel, val) => {
+      if (channel === 'open-file') handleSelectFile();
+      if (channel === 'save-project') handleSaveProject();
+      if (channel === 'export-csv') handleExportCSV();
+      if (channel === 'set-week-end') setWeekEndingDay(val);
+    });
+  }, [data, weekEndingDay, filePath]); // Re-bind when data changes so handlers have latest state
 
 
   const handleSelectFile = async () => {
@@ -84,60 +96,26 @@ const App = () => {
     }
   };
 
-  const [weekEndingDay, setWeekEndingDay] = useState(5); // Default to Friday
-
   console.log(window);
   return (
     <div className="app-container">
-      {/*Top Menu Bar, file optons for controls */}
-      <header className="menu-bar">
-        <div className="brand">Schedule Resource Prototype</div>
-        <div className="file-status">{filePath || "No File Loaded"}</div>
-        <div className="actions">
-          {data.length > 0 && (
-          <button onClick={handleExportCSV} className="export-btn">
-            Export CSV
-          </button>
-          )}
-        </div>
+      {/* 1. Subtle Status Header */}
+      <header className="app-header">
+        <span className="brand">Schedule Resource Prototype</span>
+        <span className="file-info">{filePath ? `Editing: ${filePath}` : "No file loaded (Cmd+O to import)"}</span>
       </header>
 
-      {/* 2. UPPER LEFT: Controls & Configuration */}
-      <section className="scroll-pane top-left-container">
-        <h3>Project Controls</h3>
-        <button onClick={handleSelectFile} className="import-btn">
-          Import CSV
-        </button>
-
-        <div className="control-group">
-          <label>Week Ending Day:</label>
-          <select value={weekEndingDay} onChange={(e) => setWeekEndingDay(parseInt(e.target.value))}>
-            <option value={1}>Monday</option>
-            <option value={2}>Tuesday</option>
-            <option value={3}>Wednesday</option>
-            <option value={4}>Thursday</option>
-            <option value={5}>Friday</option>
-            <option value={6}>Saturday</option>
-            <option value={0}>Sunday</option>
-          </select>
-        </div>
-      </section>
-
-      {/* 3. UPPER RIGHT: Data Table View */}
-      <section className="scroll-pane top-right-container">
-        <h3>Schedule Data</h3>
+      <main className="main-layout">
+        {/* 2. TOP PANE: The Data Table */}
+        <section className="table-pane">
           <DataTable data={data} />
+        </section>
 
-      </section>
-      {/* 4. BOTTOM: Full-Width Histogram Stage */}
-      <footer className="histogram-container">
-        <div className="histogram-header">
-          <h3>Histrogram</h3>
-        </div>
-        <div className="histogram-stage">
+        {/* 3. BOTTOM PANE: The Histogram */}
+        <section className="histogram-pane">
           <Histogram data={data} weekEndingDay={weekEndingDay} />
-        </div>
-      </footer>
+        </section>
+      </main>
     </div>
   );
 };

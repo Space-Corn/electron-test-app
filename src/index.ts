@@ -1,5 +1,4 @@
-import { app, BrowserWindow } from 'electron';
-import { ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
 import fs from 'fs';
 import path from 'path'; // You might need this later for file paths!
 
@@ -80,17 +79,55 @@ ipcMain.handle('dialog:exportCSV', async (event, content) => {
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    height: 800,
+    width: 1200,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+// --- START MENU DEFINITION ---
+const template: any[] = [
+  {
+    label: 'File',
+    submenu: [
+      { label: 'Import File', accelerator: 'CmdOrCtrl+O', click: () => mainWindow.webContents.send('menu:open-file') },
+      { label: 'Save Project', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
+      { label: 'Export CSV', click: () => mainWindow.webContents.send('menu:export-csv') },
+      { type: 'separator' },
+      { role: 'quit' }
+    ]
+  },
+  {
+    label: 'Histogram',
+    submenu: [
+      { label: 'Set Week Ending Day' ,
+      submenu: [
+        { label: 'Sunday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 0) },
+        { label: 'Monday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 1) },
+        { label: 'Tuesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 2) },
+        { label: 'Wednesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 3) },
+        { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 4) },
+        { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('menu:set-week-end', 5) },
+        { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 6) }
+      ]}
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'toggleDevTools' }
+    ]
+  }
+];
 
-  // Open the DevTools.
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
+// --- END MENU DEFINITION ---
+
+  // load the index.html of the app and open devtools
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   mainWindow.webContents.openDevTools();
 };
 
