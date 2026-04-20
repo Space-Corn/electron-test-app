@@ -111,7 +111,9 @@ const template: any[] = [
   {
     label: 'Schedule',
     submenu:[
-      { label: 'Future scheduling options will go here.'}
+      { label: 'Future scheduling options will go here.'},
+      { label: 'Switch to Baseline (Hotkey)'},
+      { label: 'Update Baseline'}
     ]
   },
   {
