@@ -7,12 +7,14 @@ export interface DailyResourceMap {
         [resId: string]: number;
 
     };
-  }
+};
   
-  /**
-   * Stage 1: The "Daily Grain"
-   * This is the hardest working function in the app.
-   */
+const parseLocalDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+
+};
+
 export const calculateDailyResourceTotals = (
     data: ScheduleRow[],
     dateType: 'early' | 'baseline' = 'early'
@@ -49,17 +51,17 @@ export const calculateDailyResourceTotals = (
     return dailyTotals;
 };
 
-export const getWeekIdentifier = (date: Date, weekEndingDay: number): string => {
-    const d = new Date(date);
-    const day = d.getDay();
+export const getWeekEndingDay = (dateStr: string, weekEndingDay: number): string => {
+    const date = parseLocalDate(dateStr);
+    const day = date.getDay();
     // Calculate how many days to add to get to the next 'weekEndingDay'
     const diff = (weekEndingDay - day + 7) % 7;
     
     // If diff is 0, it's already Friday, we keep it. 
     // Otherwise, we move it forward to the upcoming Friday.
-    d.setDate(d.getDate() + diff);
+    date.setDate(date.getDate() + diff);
     
-    return d.toISOString().split('T')[0]; // Returns "YYYY-MM-DD"
+    return date.toISOString().split('T')[0]; // Returns "YYYY-MM-DD"
   };
 
 /**
@@ -73,7 +75,7 @@ export const calculateWeeklyResourceTotals = (
     const weeklyGroups: { [weekKey: string]: { total: number, breakdown: ResourceBreakdown } } = {};
   
     Object.entries(dailyMap).forEach(([dateKey, resourceData]) => {
-      const weekKey = getWeekIdentifier(new Date(dateKey), weekEndingDay);
+      const weekKey = getWeekEndingDay(dateKey, weekEndingDay);
   
       // Initialize the week if it doesn't exist
       if (!weeklyGroups[weekKey]) {
