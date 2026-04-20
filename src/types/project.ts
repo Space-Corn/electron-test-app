@@ -22,9 +22,14 @@ export interface ScheduleRow {
     keyEvent: string;
 }
 
+export interface ResourceBreakdown {
+  [resId: string]: number;
+}
+
 export interface WeeklyStat {
   week: string;
   hours: number;
+  breakdown: ResourceBreakdown;
 }
 
 export interface ProjectFile {

@@ -43,3 +43,11 @@ body {
   background: white;
   padding: 10px;
 }
+
+.y-axis {
+  /* ... your existing styles ... */
+  background-color: white; /* Or the same as your pane background */
+  z-index: 10;             /* Keeps it on top of the scrolling bars */
+  position: sticky;        /* Alternative way to keep it fixed */
+  left: 0;
+}

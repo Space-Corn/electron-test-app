@@ -1,4 +1,4 @@
-Act_ID,Act_Desc,Orig_Dur,Res_ID,Res_Level,Percent_Complete,ES_Date,EF_Date,Float,Percent_Planned,BS_Date,BF_Date,Res_Curve,Key_Event
+actId,actDesc,origDur,resId,resLevel,percentComplete,esDate,efDate,totalFloat,percentPlanned,bsDate,bfDate,resCurve,keyEvent
 20000000.01.58,PCD Accomplished,1d,500.07.PIP,76,0.9805,03/04/2026,09Mar2026,4d,0.335,04Mar2026,03/09/26,T,FC
 20000001.01.54,Install Structural Foundation,5d,500.07.PMO,59,95.41,02/28/26,03/05/2026,10d,0.6952,02/28/2026,03/05/2026,B,PCD
 20000002.01.32,PCD Accomplished,5d,500.07.PMO,13,0.8645,03/02/26,06Mar2026,0d,7.51,03/02/26,03/06/2026,B,UD
