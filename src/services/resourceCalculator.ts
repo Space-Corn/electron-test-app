@@ -51,10 +51,16 @@ export const calculateDailyResourceTotals = (
 
 export const getWeekIdentifier = (date: Date, weekEndingDay: number): string => {
     const d = new Date(date);
-    const daysUntilEnd = (weekEndingDay - d.getDay() + 7) % 7;
-    d.setDate(d.getDate() + daysUntilEnd);
-    return d.toISOString().split('T')[0];
-};
+    const day = d.getDay();
+    // Calculate how many days to add to get to the next 'weekEndingDay'
+    const diff = (weekEndingDay - day + 7) % 7;
+    
+    // If diff is 0, it's already Friday, we keep it. 
+    // Otherwise, we move it forward to the upcoming Friday.
+    d.setDate(d.getDate() + diff);
+    
+    return d.toISOString().split('T')[0]; // Returns "YYYY-MM-DD"
+  };
 
 /**
  * Stage 2: Grouping the Daily Grain into Weekly Buckets

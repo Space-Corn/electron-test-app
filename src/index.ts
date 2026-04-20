@@ -128,7 +128,10 @@ const template: any[] = [
         { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 4) },
         { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('menu:set-week-end', 5) },
         { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 6) }
-      ]}
+      ]},
+      { label: 'Preferences...' ,
+        click: () => openPreferences(mainWindow)
+      }
     ]
   },
   {
@@ -147,6 +150,33 @@ Menu.setApplicationMenu(menu);
   // load the index.html of the app and open devtools
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   mainWindow.webContents.openDevTools();
+};
+
+let prefsWindow: BrowserWindow | null = null;
+
+export const openPreferences = (mainWindow: BrowserWindow) => {
+  if (prefsWindow) {
+    prefsWindow.focus();
+    return;
+  }
+
+  prefsWindow = new BrowserWindow({
+    width: 400,
+    height: 350,
+    resizable: false,
+    parent: mainWindow,
+    modal: true, // This locks the main window until settings are closed
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    },
+  });
+
+  // We use a hash route so React knows what to show
+  prefsWindow.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}#/preferences`);
+
+  prefsWindow.on('closed', () => {
+    prefsWindow = null;
+  });
 };
 
 // This method will be called when Electron has finished
