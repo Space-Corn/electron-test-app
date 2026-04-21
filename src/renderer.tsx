@@ -1,32 +1,23 @@
-import './index.css';
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, Root as ReactRootType } from 'react-dom/client'; // Import the type here
 import App from './App';
 import PreferencesView from './components/PreferencesView';
 
-
-const Root = () => {
-  // Check the "Hash" in the URL
-  // If Electron loads the window with #/preferences, show the settings
+const RootComponent = () => {
   const isPreferences = window.location.hash === '#/preferences';
-
   return isPreferences ? <PreferencesView /> : <App />;
 };
 
 const container = document.getElementById('root');
 
 if (container) {
-  const root = createRoot(container);
-  root.render(<Root />);
-} else {
-  console.error("Could not find root element to mount React!");
+  // Use the type we just imported to tell TS what this is
+  let root = (container as any)._reactRoot as ReactRootType;
+
+  if (!root) {
+    root = createRoot(container);
+    (container as any)._reactRoot = root;
+  }
+
+  root.render(<RootComponent />);
 }
-
-const root = createRoot(container!);
-root.render(
-  <React.StrictMode>
-    <Root />
-  </React.StrictMode>
-);
-
-

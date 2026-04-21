@@ -10,11 +10,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // New Listener: This lets React "listen" for menu clicks
   onMenuAction: (callback: (channel: string, data?: any) => void) => {
-    const subscription = (event: any, data: any) => callback(event.sender.id, data);
-    // Listen for specific channels we defined in the menu
+
+    ipcRenderer.removeAllListeners('menu:open-file');
+    ipcRenderer.removeAllListeners('menu:save-project');
+    ipcRenderer.removeAllListeners('menu:export-csv');
+    ipcRenderer.removeAllListeners('menu:set-week-end');
+
     ipcRenderer.on('menu:open-file', () => callback('open-file'));
     ipcRenderer.on('menu:save-project', () => callback('save-project'));
     ipcRenderer.on('menu:export-csv', () => callback('export-csv'));
     ipcRenderer.on('menu:set-week-end', (event, val) => callback('set-week-end', val));
+  },
+
+  removeAllMenuListeners: () => {
+    ipcRenderer.removeAllListeners('menu:open-file');
+    ipcRenderer.removeAllListeners('menu:save-project');
+    ipcRenderer.removeAllListeners('menu:export-csv');
+    ipcRenderer.removeAllListeners('menu:set-week-end');
   }
 });
+
