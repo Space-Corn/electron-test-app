@@ -16,6 +16,7 @@ declare global {
       saveProject: (content: string) => Promise<boolean>;
       exportCSV: (content: string) => Promise<boolean>;
       onMenuAction: (callback: (channel: string, data?: any) => void) => void;
+      removeAllMenuListeners: () => void;
     };
   }
 }
@@ -33,7 +34,14 @@ const App = () => {
       if (channel === 'export-csv') handleExportCSV();
       if (channel === 'set-week-end') setWeekEndingDay(val);
     });
-  }, [data, weekEndingDay, filePath]); // Re-bind when data changes so handlers have latest state
+  
+    // CLEANUP: Runs when the app or component is destroyed
+    return () => {
+      if (window.electronAPI.removeAllMenuListeners) {
+        window.electronAPI.removeAllMenuListeners();
+      }
+    };
+  }, []); // Empty array = "Only run on start-up"
 
 
   const handleSelectFile = async () => {

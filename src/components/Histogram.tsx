@@ -46,7 +46,7 @@ const Histogram: React.FC<HistogramProps> = ({ data, weekEndingDay }) => {
     <div style={{ display: 'flex', width: '100%', height: '350px', background: '#fff' }}>
       
       {/* YOUR CUSTOM LEGEND (Keep it! It looks better than the default one) */}
-      <div style={{ width: '160px', padding: '15px', borderRight: '1px solid #ddd', flexShrink: 0 }}>
+      <div style={{ width: '100px', padding: '15px', borderRight: '1px solid #ddd', flexShrink: 0 }}>
         <h4 style={{ fontSize: '14px', marginBottom: '10px' }}>Resources</h4>
         {allResources.map(resId => (
           <div key={resId} style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', fontSize: '11px' }}>
@@ -59,7 +59,7 @@ const Histogram: React.FC<HistogramProps> = ({ data, weekEndingDay }) => {
       {/* RECHARTS AREA */}
       <div style={{ flex: 1, padding: '10px', overflowX: 'auto' }}>
         {/* We set a fixed width based on data length to force the horizontal scroll */}
-        <div style={{ width: stats.length * 70, height: '350px' }}>
+        <div style={{ width: stats.length * 70, height: '330px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
