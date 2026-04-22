@@ -1,4 +1,4 @@
-import { ScheduleRow, WeeklyStat, ResourceBreakdown } from '../types/project';
+import { SystemActivity, WeeklyStat, ResourceBreakdown } from '../types/project';
 
 
 
@@ -16,7 +16,7 @@ const parseLocalDate = (dateStr: string): Date => {
 };
 
 export const calculateDailyResourceTotals = (
-    data: ScheduleRow[],
+    data: SystemActivity[],
     dateType: 'early' | 'baseline' = 'early'
 ): DailyResourceMap => {
     const dailyTotals: DailyResourceMap = {};

@@ -1,9 +1,9 @@
-import { ProjectFile, ScheduleRow } from '../types/project';
+import { ProjectFile, SystemActivity } from '../types/project';
 
 
 
 export const createProjectPayload = (
-  data: ScheduleRow[], 
+  data: SystemActivity[], 
   weekEndingDay: number, 
   filePath: string | null
 ): ProjectFile => {

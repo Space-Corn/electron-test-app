@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScheduleRow } from '../types/project';
+import { SystemActivity } from '../types/project';
 
 interface Props {
-  data: ScheduleRow[];
+  data: SystemActivity[];
 }
 
 const DataTable = ({ data }: Props) => {

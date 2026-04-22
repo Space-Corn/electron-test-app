@@ -1,4 +1,4 @@
-import { ScheduleRow } from '../types/project';
+import { SystemActivity } from '../types/project';
 
 
 /**
@@ -61,7 +61,7 @@ export const normalizeToDays = (raw: any): number => {
     }
 };
 
-export const processRawData = (rawRows: any[]): ScheduleRow[] => {
+export const processRawData = (rawRows: any[]): SystemActivity[] => {
     return rawRows.map((row, index) => ({
       actId: String(row['Activity ID'] || row['actId'] || index),
       actType: String(row['Activity Type'] || row['actType'] || ""),
@@ -77,7 +77,7 @@ export const processRawData = (rawRows: any[]): ScheduleRow[] => {
       bfDate: sanitizeDate(row['bfDate']),
       totalFloat: sanitizeNumber(row['totalFloat']),
       resLevel: sanitizeNumber(row['resLevel']),
-      resCurve: String(row['resCurve'] || 'Linear'),
+      resCurve: (row['resCurve'] || 'Linear'),
       keyEvent: String(row['keyEvent']),
       originalData: row 
     }));

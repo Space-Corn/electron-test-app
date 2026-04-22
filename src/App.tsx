@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
-import { ScheduleRow } from './types/project';
+import { SystemActivity } from './types/project';
 import { processRawData, sanitizeDate } from './services/dataProcessor';
 import { createProjectPayload } from './services/projectService';
 
@@ -17,6 +17,7 @@ declare global {
       exportCSV: (content: string) => Promise<boolean>;
       onMenuAction: (callback: (channel: string, data?: any) => void) => void;
       removeAllMenuListeners: () => void;
+      importScout: () => Promise<any>;
     };
   }
 }
@@ -104,13 +105,28 @@ const App = () => {
     }
   };
 
+  const [loadedProject, setLoadedProject] = useState<{
+    name: string;
+    id: string;
+    statusDate: string;
+  } | null>(null);
+
   console.log(window);
   return (
     <div className="app-container">
       {/* 1. Subtle Status Header */}
       <header className="app-header">
-        <span className="brand">Schedule Resource Prototype</span>
-        <span className="file-info">{filePath ? `Editing: ${filePath}` : "No file loaded (Cmd+O to import)"}</span>
+      {loadedProject ? (
+        <div className="project-info">
+          <strong>{loadedProject.name}</strong> 
+          <span className="divider">|</span> 
+          Project ID: {loadedProject.id} 
+          <span className="divider">|</span> 
+          Status Date: {loadedProject.statusDate || 'Not Started'}
+        </div>
+      ) : (
+        <div className="project-info">No Project Loaded: Use File {'>'} Import Project</div>
+      )}
       </header>
 
       <main className="main-layout">

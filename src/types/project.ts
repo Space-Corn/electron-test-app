@@ -1,25 +1,48 @@
-export interface ScheduleRow {
-    actId: string;
-    actType: string;
-    actDesc: string;
-    // Normalized to numbers for math later (e.g. 5 instead of "5d")
-    origDur: number; 
-    remDur: number;
-    // Percentages are best as decimals (0.54 instead of "54%")
-    percentComplete: number;
-    percentPlanned: number;
-    resId: string;
-    // Dates stay as ISO strings "YYYY-MM-DD"
-    esDate: string;
-    efDate: string;
-    bsDate: string;
-    bfDate: string;
-    // Float is vital for scheduling logic—keep it as a number!
-    totalFloat: number;
-    resLevel: number;
-    resCurve: string; // e.g., "Linear", "Back Loaded"
-    originalData: any; 
-    keyEvent: string;
+export interface SystemActivity {
+  // Identity
+  actId: string;
+  actType: string;
+  actDesc: string;
+  keyEvent: string;
+
+  // Progress & Duration
+  origDur: number;
+  remDur: number;
+  percentComplete: number;
+  percentPlanned: number;
+  totalFloat: number;
+
+  // Resource Logic
+  resId: string;
+  resLevel: number; // The "Y-axis" value
+  resCurve: 'Linear' | 'Back Loaded' | 'Front Loaded' | 'S-Curve'; // Made this a union type for better safety
+
+  // Dates (Strict ISO "YYYY-MM-DD")
+  esDate: string;
+  efDate: string;
+  bsDate: string;
+  bfDate: string;
+}
+
+export interface ImportMap {
+  // Map of SystemField -> CSVHeaderName
+  // Example: { actId: "Activity ID", actDesc: "Description" }
+  fieldMap: Record<keyof Omit<SystemActivity, 'resCurve'>, string>;
+  
+  // Global Project Metadata from the Dialog
+  projectMetadata: {
+      projectName: string;
+      projectId: string;
+      projectOwner: string;
+      startDate: string;
+      endDate: string;
+      statusDate: string;
+      updatePeriod: 'Weekly' | 'Monthly';
+      weekEndingDay: number; // 0-6
+  };
+
+  // Date Format Helper
+  csvDateFormat: string; // e.g., "MM/DD/YYYY"
 }
 
 export interface ResourceBreakdown {
@@ -39,5 +62,5 @@ export interface ProjectFile {
       weekEndingDay: number;
       originalFilePath: string | null;
     };
-    scheduleData: ScheduleRow[];
+    scheduleData: SystemActivity[];
   }

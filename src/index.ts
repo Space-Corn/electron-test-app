@@ -13,6 +13,33 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+// new handler for more robust import process. this will scout the data prior to full import.
+ipcMain.handle('dialog:importScout', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+  });
+
+  if (result.canceled || result.filePaths.length === 0) return null;
+
+  const filePath = result.filePaths[0];
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const allLines = fileContent.split(/\r?\n/).filter(line => line.trim() !== "");
+  
+  if (allLines.length === 0) return null;
+
+  // Extract headers and a 5-row sample for the preview
+  const headers = allLines[0].split(',').map(h => h.trim());
+  const sampleData = allLines.slice(1, 6).map(line => line.split(',').map(cell => cell.trim()));
+
+  return {
+    headers,
+    sampleData,
+    filePath,
+    fileName: path.basename(filePath)
+  };
+});
+
 ipcMain.handle('dialog:openFile', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openFile'],
