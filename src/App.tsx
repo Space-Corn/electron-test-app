@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
+import MappingModal from './components/MappingModal'
 import { SystemActivity } from './types/project';
 import { processRawData, sanitizeDate } from './services/dataProcessor';
 import { createProjectPayload } from './services/projectService';
@@ -111,6 +112,13 @@ const App = () => {
     statusDate: string;
   } | null>(null);
 
+  const [scoutData, setScoutData] = useState(null);
+
+  const handleStartImport = async () => {
+    const data = await window.electronAPI.importScout();
+    if (data) setScoutData(data);
+  };
+
   console.log(window);
   return (
     <div className="app-container">
@@ -140,6 +148,17 @@ const App = () => {
           <Histogram data={data} weekEndingDay={weekEndingDay} />
         </section>
       </main>
+      {scoutData && (
+        <MappingModal 
+          scoutData={scoutData} 
+          onCancel={() => setScoutData(null)}
+          onConfirm={(config) => {
+            console.log("Final Config:", config);
+            // Next Step: Trigger the full file parse with this config!
+            setScoutData(null);
+          }} 
+        />
+      )}
     </div>
   );
 };
