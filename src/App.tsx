@@ -32,6 +32,7 @@ const App = () => {
   useEffect(() => {
     window.electronAPI.onMenuAction((channel, val) => {
       if (channel === 'open-file') handleSelectFile();
+      if (channel === 'import-project') handleStartImport();
       if (channel === 'save-project') handleSaveProject();
       if (channel === 'export-csv') handleExportCSV();
       if (channel === 'set-week-end') setWeekEndingDay(val);
@@ -115,7 +116,9 @@ const App = () => {
   const [scoutData, setScoutData] = useState(null);
 
   const handleStartImport = async () => {
+    console.log("Starting Scout...");
     const data = await window.electronAPI.importScout();
+    console.log("Scout Data Received:", data);
     if (data) setScoutData(data);
   };
 
@@ -135,6 +138,9 @@ const App = () => {
       ) : (
         <div className="project-info">No Project Loaded: Use File {'>'} Import Project</div>
       )}
+        <button onClick={handleStartImport} style={{position: 'absolute', top: 50, left: 20, zIndex: 9999}}>
+          TEST IMPORT DIALOG
+        </button>
       </header>
 
       <main className="main-layout">

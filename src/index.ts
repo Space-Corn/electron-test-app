@@ -103,9 +103,10 @@ ipcMain.handle('dialog:exportCSV', async (event, content) => {
   return null;
 });
 
+let mainWindow: BrowserWindow | null = null;
 const createWindow = (): void => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     height: 800,
     width: 1200,
     webPreferences: {
@@ -113,70 +114,81 @@ const createWindow = (): void => {
     },
   });
 
-// --- START MENU DEFINITION ---
-const isMac = process.platform === 'darwin';
+  // --- START MENU DEFINITION ---
+  const isMac = process.platform === 'darwin';
 
-const template: any[] = [
-  ...(isMac ? [{ role: 'appMenu' }] : []), // This puts the standard Mac menu first
-  {
-    label: 'File',
-    submenu: [
-      { label: 'Import File...', accelerator: 'CmdOrCtrl+O', click: () => mainWindow.webContents.send('menu:open-file') },
-      { label: 'Save Project As...', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
-      { label: 'Export CSV...', click: () => mainWindow.webContents.send('menu:export-csv') },
-      { type: 'separator' },
-      { role: 'quit' }
-    ]
-  },
-  {
-    label: 'Edit',
-    submenu:[
-      { label: 'Hi there, you found me.' },
-      { label: 'Project Preferences' },
-    ]
-  },
-  {
-    label: 'Schedule',
-    submenu:[
-      { label: 'Future scheduling options will go here.'},
-      { label: 'Switch to Baseline (Hotkey)'},
-      { label: 'Update Baseline'}
-    ]
-  },
-  {
-    label: 'Histogram',
-    submenu: [
-      { label: 'Set Week Ending Day' ,
+  const template: any[] = [
+    ...(isMac ? [{ role: 'appMenu' }] : []), // This puts the standard Mac menu first
+    {
+      label: 'File',
       submenu: [
-        { label: 'Sunday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 0) },
-        { label: 'Monday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 1) },
-        { label: 'Tuesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 2) },
-        { label: 'Wednesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 3) },
-        { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 4) },
-        { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('menu:set-week-end', 5) },
-        { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 6) }
-      ]},
-      { label: 'Preferences...' ,
-        click: () => openPreferences(mainWindow)
-      }
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      { role: 'reload' },
-      { role: 'toggleDevTools' }
-    ]
-  }
-];
+        { label: 'Import Project As New...',
+          accelerator: 'CmdOrCtrl+O',
+          click: () => {
+            // Use the global reference
+            if (mainWindow) {
+              console.log("Main process: Menu Clicked, sending to renderer...");
+              mainWindow.webContents.send('menu:import-project');
+            } else {
+              console.error("Main process: mainWindow is null!");
+            } 
+          }
+        },
+        { label: 'Save Project As...', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
+        { label: 'Export CSV...', click: () => mainWindow.webContents.send('menu:export-csv') },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu:[
+        { label: 'Hi there, you found me.' },
+        { label: 'Project Preferences' },
+      ]
+    },
+    {
+      label: 'Schedule',
+      submenu:[
+        { label: 'Future scheduling options will go here.'},
+        { label: 'Switch to Baseline (Hotkey)'},
+        { label: 'Update Baseline'}
+      ]
+    },
+    {
+      label: 'Histogram',
+      submenu: [
+        { label: 'Set Week Ending Day' ,
+        submenu: [
+          { label: 'Sunday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 0) },
+          { label: 'Monday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 1) },
+          { label: 'Tuesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 2) },
+          { label: 'Wednesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 3) },
+          { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 4) },
+          { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('menu:set-week-end', 5) },
+          { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 6) }
+        ]},
+        { label: 'Preferences...' ,
+          click: () => openPreferences(mainWindow)
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'toggleDevTools' }
+      ]
+    }
+  ];
 
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
-// --- END MENU DEFINITION ---
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+  // --- END MENU DEFINITION ---
 
-  // load the index.html of the app and open devtools
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  mainWindow.webContents.openDevTools();
+    // load the index.html of the app and open devtools
+    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+    mainWindow.webContents.openDevTools();
 };
 
 let prefsWindow: BrowserWindow | null = null;
