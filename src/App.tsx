@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
+//this is why ram is so expensive.
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';

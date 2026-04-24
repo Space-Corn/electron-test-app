@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SYSTEM_FIELDS } from '../config/mappingConfig';
-//Day 11, lets go! Working on full data ingestion and import window format + minor changes.
+
 
 interface MappingModalProps {
     scoutData: {
