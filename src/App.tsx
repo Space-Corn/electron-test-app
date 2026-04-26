@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
-//now for the fun part...
+//here is where the going gets tough. lets write some code tomorrow!
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
