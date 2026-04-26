@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
-//here is where the going gets tough. lets write some code tomorrow!
+//created a kanri board to track and plan app features.
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
