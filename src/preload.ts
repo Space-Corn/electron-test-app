@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveProject: (content: string) => ipcRenderer.invoke('dialog:saveProject', content),
   exportCSV: (content: string) => ipcRenderer.invoke('dialog:exportCSV', content),
   importScout: () => ipcRenderer.invoke('dialog:importScout'),
+  readRawFile: (filePath: string) => ipcRenderer.invoke('file:readRaw', filePath),
 
   // New Listener: This lets React "listen" for menu clicks
   onMenuAction: (callback: (channel: string, data?: any) => void) => {

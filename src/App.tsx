@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
-//created a kanri board to track and plan app features.
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
@@ -20,9 +19,45 @@ declare global {
       onMenuAction: (callback: (channel: string, data?: any) => void) => void;
       removeAllMenuListeners: () => void;
       importScout: () => Promise<any>;
+      readRawFile: (filePath: string) => Promise<string>;
     };
   }
 }
+
+
+const transformCsvToSystemData = (
+  rawData: any[], 
+  fieldMap: Record<string, string>
+): SystemActivity[] => {
+  return rawData.map((row) => {
+    const getValue = (systemKey: string): string => {
+      const csvHeader = fieldMap[systemKey];
+      return csvHeader ? (row[csvHeader] || '').trim() : '';
+    };
+
+    return {
+      actId: getValue('actId'),
+      actDesc: getValue('actDesc'),
+      actType: getValue('actType') || 'Task',
+      keyEvent: getValue('keyEvent') || 'None',
+      
+      origDur: Number(getValue('origDur')) || 0,
+      remDur: Number(getValue('remDur')) || 0,
+      percentComplete: Number(getValue('percentComplete')) || 0,
+      percentPlanned: Number(getValue('percentPlanned')) || 0,
+      totalFloat: Number(getValue('totalFloat')) || 0,
+      
+      resId: getValue('resId') || 'Unassigned',
+      resLevel: Number(getValue('resLevel')) || 0,
+      resCurve: 'Linear', 
+      
+      esDate: getValue('esDate'),
+      efDate: getValue('efDate'),
+      bsDate: getValue('bsDate') || getValue('esDate'), 
+      bfDate: getValue('bfDate') || getValue('efDate'), 
+    };
+  });
+};
 
 const App = () => {
   const [filePath, setFilePath] = useState<string | null>(null);
@@ -123,6 +158,44 @@ const App = () => {
     if (data) setScoutData(data);
   };
 
+  const handleConfirmImport = async (config: { metadata: any; fieldMap: Record<string, string> }) => {
+    if (!scoutData) return;
+
+    try {
+      // 1. Fetch full raw file contents using the file path saved during the scout phase
+      const rawContent = await window.electronAPI.readRawFile((scoutData as any).filePath);
+      
+      // 2. Parse the entire raw text file with headers enabled
+      const parsed = Papa.parse(rawContent, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      // 3. Transform the raw CSV rows using the custom field mapping dictionary
+      const mappedActivities = transformCsvToSystemData(parsed.data, config.fieldMap);
+
+      // 4. Update the state data buckets to instantly refresh the charts and grid
+      setData(mappedActivities);
+      setFilePath((scoutData as any).filePath);
+      setWeekEndingDay(Number(config.metadata.weekEndingDay));
+
+      // 5. Commit project metadata to show up in your upper header container
+      setLoadedProject({
+        name: config.metadata.projectName,
+        id: config.metadata.projectId,
+        statusDate: config.metadata.statusDate
+      });
+
+      // 6. Tear down the mapping modal overlay
+      setScoutData(null);
+      alert(`Import complete! Loaded ${mappedActivities.length} activities.`);
+
+    } catch (error) {
+      console.error("Failed to parse full import file:", error);
+      alert("An error occurred during file ingestion.");
+    }
+  };
+
   console.log(window);
   return (
     <div className="app-container">
@@ -139,9 +212,6 @@ const App = () => {
       ) : (
         <div className="project-info">No Project Loaded: Use File {'>'} Import Project</div>
       )}
-        <button onClick={handleStartImport} style={{position: 'absolute', top: 50, left: 20, zIndex: 9999}}>
-          TEST IMPORT DIALOG
-        </button>
       </header>
 
       <main className="main-layout">
@@ -159,11 +229,7 @@ const App = () => {
         <MappingModal 
           scoutData={scoutData} 
           onCancel={() => setScoutData(null)}
-          onConfirm={(config) => {
-            console.log("Final Config:", config);
-            // Next Step: Trigger the full file parse with this config!
-            setScoutData(null);
-          }} 
+          onConfirm={handleConfirmImport}
         />
       )}
     </div>

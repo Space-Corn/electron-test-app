@@ -40,6 +40,15 @@ ipcMain.handle('dialog:importScout', async () => {
   };
 });
 
+ipcMain.handle('file:readRaw', async (event, filePath) => {
+  try {
+    return fs.readFileSync(filePath, 'utf-8');
+  } catch (error) {
+    console.error("Failed to read file path:", error);
+    return "";
+  }
+});
+
 ipcMain.handle('dialog:openFile', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openFile'],
