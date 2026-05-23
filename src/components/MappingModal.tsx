@@ -35,13 +35,22 @@ const MappingModal: React.FC<MappingModalProps> = ({ scoutData, onConfirm, onCan
   useEffect(() => {
     const initialMap: Record<string, string> = {};
     
-    // Loop through all our categories
     Object.values(SYSTEM_FIELDS).flat().forEach(field => {
       const match = headers.find(h => 
         h.toLowerCase().replace(/[^a-z0-9]/g, '') === 
         field.label.toLowerCase().replace(/[^a-z0-9]/g, '')
       );
-      if (match) initialMap[field.key] = match;
+      
+      if (match) {
+        initialMap[field.key] = match;
+      } else {
+        // --- TEMPORARY TESTING SHORTCUT ---
+        // If your test CSV column is called "Activity ID", this forces a match to "actId"
+        if (field.key === 'actId') initialMap['actId'] = headers[0]; 
+        if (field.key === 'actDesc') initialMap['actDesc'] = headers[1];
+        if (field.key === 'esDate') initialMap['esDate'] = headers[2];
+        if (field.key === 'efDate') initialMap['efDate'] = headers[3];
+      }
     });
     
     setFieldMap(initialMap);

@@ -1,0 +1,13 @@
+actId,actDesc,esDate,efDate,origDur,resId,resLevel,percentComplete,totalFloat,percentPlanned,bsDate,bfDate,resCurve,keyEvent
+10056001.01.01, Install Structural Foundation,2/27/2026, 3/3/2026, 5d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.01A, Paint Foundation,2/27/2026, 3/3/2026, 2d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.02, Install Equipment on Foundation,3/4/2026, 3/9/2026, 5d, 500.07.OSM, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.03, Hookup Equipment Electrically and Test,3/10/2026, 3/12/2026, 3d, 500.07.ELE, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.07, Install Structural Foundation,2/27/2026, 3/3/2026, 5d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.07A, Paint Foundation,2/27/2026, 3/3/2026, 2d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.08, Install Equipment on Foundation,3/4/2026, 3/9/2026, 5d, 500.07.OSM, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.09, Hookup Equipment Electrically and Test,3/10/2026, 3/12/2026, 3d, 500.07.ELE, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.10, Install Structural Foundation,2/27/2026, 3/3/2026, 5d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.10A, Paint Foundation,2/27/2026, 3/3/2026, 2d, 500.07.PSF, 32, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.11, Install Equipment on Foundation,3/4/2026, 3/9/2026, 5d, 500.07.OSM, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD
+10056001.01.12, Hookup Equipment Electrically and Test,3/10/2026, 3/12/2026, 3d, 500.07.ELE, 80, 0%, 5d, 0%, 2/27/2026, 3/3/2026, T, PCD

@@ -131,20 +131,49 @@ const createWindow = (): void => {
     {
       label: 'File',
       submenu: [
+        { label: 'New Project... (Not Implemented Yet)'},
         { label: 'Import Project As New...',
-          accelerator: 'CmdOrCtrl+O',
+          accelerator: 'CmdOrCtrl+I',
           click: () => {
             // Use the global reference
             if (mainWindow) {
               console.log("Main process: Menu Clicked, sending to renderer...");
-              mainWindow.webContents.send('menu:import-project');
+              mainWindow.webContents.send('import-project');
             } else {
               console.error("Main process: mainWindow is null!");
             } 
           }
         },
-        { label: 'Save Project As...', accelerator: 'CmdOrCtrl+S', click: () => mainWindow.webContents.send('menu:save-project') },
-        { label: 'Export CSV...', click: () => mainWindow.webContents.send('menu:export-csv') },
+        { type: 'separator' },
+        { 
+          label: 'Open Existing Project... (JSON)', 
+          accelerator: 'CmdOrCtrl+O', 
+          click: () => {
+            if (mainWindow) {
+              mainWindow.webContents.send('open-file'); // Matches App.tsx exactly
+            }
+          }
+        },
+        { type: 'separator' },
+        { label: 'Save Project (Not Implemented Yet)'},
+        { 
+          label: 'Save Project As...', 
+          accelerator: 'CmdOrCtrl+S', 
+          click: () => {
+            if (mainWindow) {
+              mainWindow.webContents.send('save-project'); // Matches App.tsx exactly
+            }
+          }
+        },
+        { type: 'separator' },
+        { 
+          label: 'Export CSV...', 
+          click: () => {
+            if (mainWindow) {
+              mainWindow.webContents.send('export-csv'); // Matches App.tsx exactly
+            }
+          } 
+        },
         { type: 'separator' },
         { role: 'quit' }
       ]

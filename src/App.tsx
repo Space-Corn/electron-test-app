@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
+
 
 import './index.css';
 import DataTable from './components/DataTable';
@@ -23,7 +24,6 @@ declare global {
     };
   }
 }
-
 
 const transformCsvToSystemData = (
   rawData: any[], 
@@ -60,11 +60,43 @@ const transformCsvToSystemData = (
 };
 
 const App = () => {
+  // --- 1. ALL STATE & REF DECLARATIONS MOVE TO THE TOP ---
   const [filePath, setFilePath] = useState<string | null>(null);
   const [data, setData] = useState<any[]>([]);
   const [weekEndingDay, setWeekEndingDay] = useState(5); // Default to Friday
+  const [currentFieldMap, setCurrentFieldMap] = useState<Record<string, string>>({});
+  const [scoutData, setScoutData] = useState(null);
+  
+  // Moved up here so everything below can see it safely!
+  const [loadedProject, setLoadedProject] = useState<{
+    name: string;
+    id: string;
+    statusDate: string;
+  } | null>(null);
 
-  // --- NEW: MENU LISTENER ---
+  const savePayloadRef = useRef<any>(null);
+
+  // --- 2. KEEP MIRROR UPDATED ---
+  useEffect(() => {
+    savePayloadRef.current = {
+      projectMetadata: {
+        // 🛡️ APPLICATION SIGNATURE TAGS
+        fileSignature: "INTEGRATED-SCHEDULE-ANALYTICS-ENGINE",
+        fileVersion: "1.0.0",
+
+        projectName: loadedProject?.name || "New Project",
+        projectId: loadedProject?.id || "No ID",
+        statusDate: loadedProject?.statusDate || "No Date"
+      },
+      settings: {
+        weekEndingDay: weekEndingDay,
+        fieldMap: currentFieldMap
+      },
+      scheduleData: data
+    };
+  }, [data, currentFieldMap, loadedProject, weekEndingDay]);
+
+  // --- 3. MENU LISTENER (WIRED TO SYSTEM SCOREBOARD) ---
   useEffect(() => {
     window.electronAPI.onMenuAction((channel, val) => {
       if (channel === 'open-file') handleSelectFile();
@@ -74,52 +106,59 @@ const App = () => {
       if (channel === 'set-week-end') setWeekEndingDay(val);
     });
   
-    // CLEANUP: Runs when the app or component is destroyed
     return () => {
       if (window.electronAPI.removeAllMenuListeners) {
         window.electronAPI.removeAllMenuListeners();
       }
     };
-  }, []); // Empty array = "Only run on start-up"
+  }, []); 
 
 
   const handleSelectFile = async () => {
     const result = await window.electronAPI?.openFile();
     
     if (result && result.content && result.filePath) {
-      const extension =result.filePath.split(".").pop()?.toLowerCase();
+      const extension = result.filePath.split(".").pop()?.toLowerCase();
 
-      if ( extension === "csv"){
-         // parse csv file with Papa.parse, and run it through processRawData to get cleanData.
-      const parsed = Papa.parse(result.content, { 
-        header: true,
-        skipEmptyLines: true 
-      });
-  
-      // 2. Convert the "dirty" array into clean data format
-      // This is our data cleaner in dataProcessor.ts
-      const cleanData = processRawData(parsed.data);
+      if (extension === "csv"){
+        const parsed = Papa.parse(result.content, { 
+          header: true,
+          skipEmptyLines: true 
+        });
+    
+        const cleanData = processRawData(parsed.data);
+        setData(cleanData);
+        setFilePath(result.filePath);
 
-      // 3. Save the clean data to your state
-      setData(cleanData);
-      setFilePath(result.filePath);
-
-      } else if (extension === 'json'){
-        // detect if its a fake JSON file
+      } else if (extension === 'json') {
         try {
           const projectData = JSON.parse(result.content);
-          if (!projectData.scheduleData) {
-            throw new Error('Invalid project file format.');
+          
+          // 🛑 THE NEW STRICT SIGNATURE CHECK
+          const hasValidSignature = 
+            projectData?.projectMetadata?.fileSignature === "INTEGRATED-SCHEDULE-ANALYTICS-ENGINE";
+
+          if (!hasValidSignature) {
+            throw new Error('Unauthorized or unrecognized file generator signature.');
           }
           
-            // we need to handle our json projectData
+          // If the signature passes, safely ingest the data fields below
           setData(projectData.scheduleData);
-          setWeekEndingDay(projectData.settings.weekEndingDay);
+          setWeekEndingDay(Number(projectData.settings.weekEndingDay) || 5);
           setFilePath(result.filePath);
-          alert("Project loaded successfully!");
-        } catch (error){
-          console.error("Load error:", error);
-          alert('Failed to load project: the project may be in the wrong format.')
+          setCurrentFieldMap(projectData.settings.fieldMap);
+          
+          setLoadedProject({
+            name: projectData.projectMetadata.projectName,
+            id: projectData.projectMetadata.projectId,
+            statusDate: projectData.projectMetadata.statusDate
+          });
+
+          alert(`Project "${projectData.projectMetadata.projectName}" verified and loaded!`);
+
+        } catch (error) {
+          console.error("Load validation error:", error);
+          alert('Failed to load project: This file was not created by this application or is an incompatible version.');
         }
 
       } else {
@@ -129,8 +168,15 @@ const App = () => {
   };
 
   const handleSaveProject = async () => {
-    const payload = createProjectPayload(data, weekEndingDay, filePath);
-    const jsonString = JSON.stringify(payload, null, 2); // The '2' makes it readable
+    if (!savePayloadRef.current) {
+      console.log("No payload compiled yet.");
+      return;
+    }
+
+    // Diagnostic tracking
+    console.log("NATIVE MENU SAVE EXECUTION - Payload State:", savePayloadRef.current);
+
+    const jsonString = JSON.stringify(savePayloadRef.current, null, 2);
     await window.electronAPI.saveProject(jsonString);
   };
   
@@ -143,14 +189,6 @@ const App = () => {
     }
   };
 
-  const [loadedProject, setLoadedProject] = useState<{
-    name: string;
-    id: string;
-    statusDate: string;
-  } | null>(null);
-
-  const [scoutData, setScoutData] = useState(null);
-
   const handleStartImport = async () => {
     console.log("Starting Scout...");
     const data = await window.electronAPI.importScout();
@@ -162,31 +200,26 @@ const App = () => {
     if (!scoutData) return;
 
     try {
-      // 1. Fetch full raw file contents using the file path saved during the scout phase
       const rawContent = await window.electronAPI.readRawFile((scoutData as any).filePath);
       
-      // 2. Parse the entire raw text file with headers enabled
       const parsed = Papa.parse(rawContent, {
         header: true,
         skipEmptyLines: true
       });
 
-      // 3. Transform the raw CSV rows using the custom field mapping dictionary
       const mappedActivities = transformCsvToSystemData(parsed.data, config.fieldMap);
 
-      // 4. Update the state data buckets to instantly refresh the charts and grid
       setData(mappedActivities);
       setFilePath((scoutData as any).filePath);
       setWeekEndingDay(Number(config.metadata.weekEndingDay));
+      setCurrentFieldMap(config.fieldMap);
 
-      // 5. Commit project metadata to show up in your upper header container
       setLoadedProject({
         name: config.metadata.projectName,
         id: config.metadata.projectId,
         statusDate: config.metadata.statusDate
       });
 
-      // 6. Tear down the mapping modal overlay
       setScoutData(null);
       alert(`Import complete! Loaded ${mappedActivities.length} activities.`);
 
@@ -196,10 +229,8 @@ const App = () => {
     }
   };
 
-  console.log(window);
   return (
     <div className="app-container">
-      {/* 1. Subtle Status Header */}
       <header className="app-header">
       {loadedProject ? (
         <div className="project-info">
@@ -215,12 +246,10 @@ const App = () => {
       </header>
 
       <main className="main-layout">
-        {/* 2. TOP PANE: The Data Table */}
         <section className="table-pane">
           <DataTable data={data} />
         </section>
 
-        {/* 3. BOTTOM PANE: The Histogram */}
         <section className="histogram-pane">
           <Histogram data={data} weekEndingDay={weekEndingDay} />
         </section>
@@ -237,4 +266,3 @@ const App = () => {
 };
 
 export default App;
-
