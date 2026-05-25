@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 
-// coffee shop vibe sesh
+// updated kanban with new tasks for later features.
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
