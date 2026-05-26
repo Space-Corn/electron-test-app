@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 
-// updated kanban with new tasks for later features.
+// gold 3
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
