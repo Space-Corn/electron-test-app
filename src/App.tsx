@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 
-// gold 3
+// can I make it?
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
