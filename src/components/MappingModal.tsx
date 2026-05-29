@@ -9,9 +9,7 @@ interface MappingModalProps {
       filePath: string;
       fileName: string;
     };
-    // 'onConfirm' expects an object with metadata and fieldMap, returns nothing
     onConfirm: (config: { metadata: any; fieldMap: Record<string, string> }) => void;
-    // 'onCancel' takes nothing, returns nothing
     onCancel: () => void;
 }
 
@@ -24,8 +22,9 @@ const MappingModal: React.FC<MappingModalProps> = ({ scoutData, onConfirm, onCan
     projectId: '',
     projectOwner: '',
     statusDate: '',
+    targetCompletionDate: '', // 📅 Subtask 1: Added Target Date Key
     updatePeriod: 'Weekly',
-    weekEndingDay: 5,
+    weekEndingDay: 5,         // 📆 Subtask 2: Existing key ready for UI input
   });
 
   // State for the actual field mapping
@@ -45,7 +44,6 @@ const MappingModal: React.FC<MappingModalProps> = ({ scoutData, onConfirm, onCan
         initialMap[field.key] = match;
       } else {
         // --- TEMPORARY TESTING SHORTCUT ---
-        // If your test CSV column is called "Activity ID", this forces a match to "actId"
         if (field.key === 'actId') initialMap['actId'] = headers[0]; 
         if (field.key === 'actDesc') initialMap['actDesc'] = headers[1];
         if (field.key === 'esDate') initialMap['esDate'] = headers[2];
@@ -67,8 +65,32 @@ const MappingModal: React.FC<MappingModalProps> = ({ scoutData, onConfirm, onCan
           <div className="grid-2-col">
             <input placeholder="Project Name" value={metadata.projectName} 
                    onChange={e => setMetadata({...metadata, projectName: e.target.value})} />
+            
             <input placeholder="Project ID" value={metadata.projectId}
                    onChange={e => setMetadata({...metadata, projectId: e.target.value})} />
+            
+            {/* SUBTASK 1: Target Completion Date input field */}
+            <div className="input-group">
+              <label style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '2px' }}>Target Completion Date</label>
+              <input type="date" value={metadata.targetCompletionDate}
+                     onChange={e => setMetadata({...metadata, targetCompletionDate: e.target.value})} />
+            </div>
+
+            {/* SUBTASK 2: Week Ending Day drop-down selector */}
+            <div className="input-group">
+              <label style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '2px' }}>Reporting Week Ending Day</label>
+              <select value={metadata.weekEndingDay}
+                      onChange={e => setMetadata({...metadata, weekEndingDay: Number(e.target.value)})}
+                      style={{ width: '100%', padding: '6px' }}>
+                <option value={0}>Sunday</option>
+                <option value={1}>Monday</option>
+                <option value={2}>Tuesday</option>
+                <option value={3}>Wednesday</option>
+                <option value={4}>Thursday</option>
+                <option value={5}>Friday</option>
+                <option value={6}>Saturday</option>
+              </select>
+            </div>
           </div>
         </section>
 

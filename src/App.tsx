@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 
-// can I make it?
+
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
@@ -72,6 +72,7 @@ const App = () => {
     name: string;
     id: string;
     statusDate: string;
+    targetCompletionDate?: string;
   } | null>(null);
 
   const savePayloadRef = useRef<any>(null);
@@ -103,7 +104,7 @@ const App = () => {
       if (channel === 'import-project') handleStartImport();
       if (channel === 'save-project') handleSaveProject();
       if (channel === 'export-csv') handleExportCSV();
-      if (channel === 'set-week-end') setWeekEndingDay(val);
+      if (channel === 'set-week-end') setWeekEndingDay(() => Number(val));
     });
   
     return () => {
@@ -151,7 +152,8 @@ const App = () => {
           setLoadedProject({
             name: projectData.projectMetadata.projectName,
             id: projectData.projectMetadata.projectId,
-            statusDate: projectData.projectMetadata.statusDate
+            statusDate: projectData.projectMetadata.statusDate,
+            targetCompletionDate: projectData.projectMetadata.targetCompletionDate || '' // Added!
           });
 
           alert(`Project "${projectData.projectMetadata.projectName}" verified and loaded!`);
@@ -211,13 +213,15 @@ const App = () => {
 
       setData(mappedActivities);
       setFilePath((scoutData as any).filePath);
-      setWeekEndingDay(Number(config.metadata.weekEndingDay));
+      setWeekEndingDay(Number(config.metadata.weekEndingDay)); // Handled!
       setCurrentFieldMap(config.fieldMap);
 
+      // Save name, id, statusDate, and target Completion Date to state
       setLoadedProject({
         name: config.metadata.projectName,
         id: config.metadata.projectId,
-        statusDate: config.metadata.statusDate
+        statusDate: config.metadata.statusDate,
+        targetCompletionDate: config.metadata.targetCompletionDate // Added!
       });
 
       setScoutData(null);

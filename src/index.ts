@@ -198,13 +198,13 @@ const createWindow = (): void => {
       submenu: [
         { label: 'Set Week Ending Day' ,
         submenu: [
-          { label: 'Sunday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 0) },
-          { label: 'Monday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 1) },
-          { label: 'Tuesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 2) },
-          { label: 'Wednesday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 3) },
-          { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 4) },
-          { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('menu:set-week-end', 5) },
-          { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('menu:set-week-end', 6) }
+          { label: 'Sunday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 0) },
+          { label: 'Monday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 1) },
+          { label: 'Tuesday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 2) },
+          { label: 'Wednesday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 3) },
+          { label: 'Thursday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 4) },
+          { label: 'Friday', type: 'radio', checked: true, click: () => mainWindow.webContents.send('set-week-end', 5) },
+          { label: 'Saturday', type: 'radio', click: () => mainWindow.webContents.send('set-week-end', 6) }
         ]},
         { label: 'Preferences...' ,
           click: () => openPreferences(mainWindow)
