@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 
-
+//update KanBan board with new ideas - working hard
 import './index.css';
 import DataTable from './components/DataTable';
 import Histogram from './components/Histogram';
